@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HomePage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+        integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+        integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+        crossorigin="anonymous"></script>
+    <script>
+        getData();
+        async function getData() {
+            try {
+                var response = await fetch("/getdata");
+                var data = await response.json();
+                //    console.log(data);
+                var divResult = document.getElementById("result");
+                for (var res of data.data) {
+                    divResult.innerHTML +=
+                        "<tr> <td> " +
+                        res.id +
+                        " </td> <td> " +
+                        res.username +
+                        " </td> <td> " +
+                        res.created_at.slice(0, 10) +
+                        " </td> <td> " +
+                        res.updated_at.slice(0, 10) +
+                        " </td> <td>  <button class='btn btn-danger col' value='" + res.id + "' data-bs-toggle='modal' data-bs-target='#deleteModal' onclick='getUserByIdDel(this)'>ลบ</button> <button class='btn btn-warning col' data-bs-toggle='modal' value='" + res.id + "' data-bs-target='#editModal' onclick='getUserById(this)'>แก้ไข</button></td> </tr>";
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        async function addUser() {
+            try {
+                var response = await fetch('/adduser', {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: 'post',
+                    body: JSON.stringify({
+                        username: document.getElementById('a_username').value,
+                        password: document.getElementById('a_password').value
+                    })
+                })
+            } catch (error) {
+                console.log(error);
+            }
+            location.reload()
+        }
+        async function getUserById(element) {
+            var id = element.value
+            // console.log(id);
+            try {
+                var response = await fetch('/getuserbyid/' + id)
+                var data = await response.json()
+                // console.log(data);
+                document.getElementById('e_id').value = data.data[0].id
+                document.getElementById('e_username').value = data.data[0].username
+                document.getElementById('e_password').value = data.data[0].password
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        async function getUserByIdDel(element) {
+            var id = element.value
+            // console.log(id);
+            try {
+                var response = await fetch('/getuserbyid/' + id)
+                var data = await response.json()
+                // console.log(data);
+                document.getElementById('d_id').value = data.data[0].id
+                document.getElementById('d_username').innerHTML = data.data[0].username
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        async function editUser() {
+            try {
+                var response = await fetch('/edituser', {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: 'post',
+                    body: JSON.stringify({
+                        id: document.getElementById('e_id').value,
+                        username: document.getElementById('e_username').value,
+                        password: document.getElementById('e_password').value
+                    })
+                })
+            } catch (error) {
+                console.log(error);
+            }
+            location.reload()
+        }
+        async function deleteUser() {
+            try {
+                var response = await fetch('/deleteuser', {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'delete',
+                    body: JSON.stringify({
+                        id: document.getElementById('d_id').value
+                    })
+                })
+            } catch (error) {
+                console.log(error);
+            }
+            location.reload()
+        }
+    </script>
+    <style>
+        body {
+
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #title,
+        table {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        button {
+            float: right;
+            margin: 0 10px;
+        }
+
+        footer {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            color: whitesmoke;
+            background-color: lightgray;
+            bottom: 0;
+            padding: 15px;
+        }
+
+        nav {
+            padding: 15px;
+            background-color: lightgray;
+            color: whitesmoke;
+            width: 100%;
+        }
+
+        .nav-link {
+            color: whitesmoke;
+        }
+
+        .active {
+            color: lightslategray;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav">
+        <ul class="nav">
+            <li class="nav-item ">
+                <a class="nav-link active" href="/home">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/exchange">Exchange</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1 id="title">ข้อมูลผู้ใช้</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+            เพิ่มผู้ใช้
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalLabel">เพิ่มผู้ใช้</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col">
+                            <div class="form-group row">
+                                <label for="username" class="col-sm-2 col-form-label">username</label>
+                                <div class="col">
+                                    <input type="text" id="a_username" class="form-control" placeholder="username" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group row">
+                                <label for="password" class="col-sm-2 col-form-label">password</label>
+                                <div class="col">
+                                    <input type="password" class="form-control" id="a_password"
+                                        placeholder="password" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            ปิด
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="addUser()"
+                            data-bs-dismiss="modal">บันทึก</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">แก้ไขข้อมูลผู้ใช้</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col">
+                            <div class="form-group row">
+                                <label for="username" class="col-sm-2 col-form-label">username</label>
+                                <div class="col">
+                                    <input type="text" id="e_username" class="form-control" placeholder="username" />
+                                    <input type="hidden" id="e_id">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group row">
+                                <label for="password" class="col-sm-2 col-form-label">password</label>
+                                <div class="col">
+                                    <input type="password" class="form-control" id="e_password"
+                                        placeholder="password" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            ปิด
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="editUser()"
+                            data-bs-dismiss="modal">แก้ไข</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">ลบข้อมูลผู้ใช้</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        คุณแน่ใจไหมที่จะลบข้อมูลผู้ใช้ <span id="d_username"></span> ?
+                        <input type="hidden" id="d_id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            ปิด
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="deleteUser()"
+                            data-bs-dismiss="modal">ลบ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <th scope="col">รหัส</th>
+                <th scope="col">ชื่อผู้ใช้</th>
+                <th scope="col">วัน - เวลา ที่สร้าง</th>
+                <th scope="col">อัปเดตล่าสุด</th>
+                <th scope="col"></th>
+            </thead>
+            <tbody id="result"></tbody>
+        </table>
+    </div>
+    <div id="footer">
+        <footer>
+            <p>CREATE BY TEETAWAT CHANPITU</p>
+        </footer>
+    </div>
+</body>
+
+</html>
